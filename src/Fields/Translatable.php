@@ -66,10 +66,6 @@ class Translatable extends Json
         if (empty($this->fields)) {
             $this->fields([
 
-                //Select::make(__('Code'), 'key')
-                //    ->options(array_combine($this->getLanguagesCodes(), array_map(static fn ($code) => Str::upper($code), $this->getLanguagesCodes())))
-                //    ->nullable(),
-
                 Text::make(__('Code'), 'key'),
                 Text::make(__('Value'), 'value'),
 
@@ -109,7 +105,9 @@ class Translatable extends Json
 
     public function formViewValue(Model $item): mixed
     {
-        return $item->getTranslations($this->field());
+
+        return collect($item->getTranslations($this->field()))
+            ->toArray();
     }
 
     /**
