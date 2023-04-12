@@ -29,9 +29,7 @@
         }
     ],
     "require": {
-        "php": "^8.0|^8.1|^8.2",
-        "moonshine/moonshine": "^1.52",
-        "laravel/framework": "^9.38"
+        "php": "^8.0|^8.1|^8.2"
     },
     "require-dev": {
     },
@@ -41,7 +39,6 @@
         }
     },
     "conflict": {
-        "moonshine/moonshine": "<1.52"
     },
     "scripts": {
     },

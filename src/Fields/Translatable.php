@@ -58,7 +58,9 @@ class Translatable extends Json
     public function keyValue(string $key = 'Language', string $value = 'Value'): static
     {
         $this->fields([
-            Text::make($key, 'key'),
+            Select::make($key, 'key')
+                ->options(array_combine($this->getLanguagesCodes(), array_map(static fn ($code) => Str::upper($code), $this->getLanguagesCodes())))
+                ->nullable(),
             Text::make($value, 'value'),
         ]);
 
@@ -67,13 +69,12 @@ class Translatable extends Json
 
     public function getFields(): Fields
     {
-
         if (empty($this->fields)) {
             $this->fields([
-
-                Text::make(__('Code'), 'key'),
+                Select::make(__('Code'), 'key')
+                    ->options(array_combine($this->getLanguagesCodes(), array_map(static fn ($code) => Str::upper($code), $this->getLanguagesCodes())))
+                    ->nullable(),
                 Text::make(__('Value'), 'value'),
-
             ]);
         }
 
@@ -110,20 +111,7 @@ class Translatable extends Json
 
     public function formViewValue(Model $item): mixed
     {
-
-        // TODO Переделать на SELECT
-
-        $array = $item->getTranslations($this->field());
-
-        if (!empty($this->requiredLanguagesCodes)) {
-            foreach ($this->requiredLanguagesCodes as $languagesCode) {
-                if (!isset($array[$languagesCode])) {
-                    $array[$languagesCode] = null;
-                }
-            }
-        }
-
-        return $array;
+        return $item->getTranslations($this->field());
     }
 
     /**
