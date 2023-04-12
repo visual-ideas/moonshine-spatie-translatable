@@ -12,7 +12,7 @@ use MoonShine\Fields\Text;
 class Translatable extends Json
 {
     protected array $languagesCodes = [
-        "af", "sq", "am", "ar", "an", "hy", "ast", "az", "eu", "be", "bn", "bs", "br", "bg", "ca", "ckb", "zh", "zh-HK", "zh-CN", "zh-TW", "co", "hr", "cs", "da", "nl", "en", "en-AU", "en-CA", "en-IN", "en-NZ", "en-ZA", "en-GB", "en-US", "eo", "et", "fo", "fil", "fi", "fr", "fr-CA", "fr-FR", "fr-CH", "gl", "ka", "de", "de-AT", "de-DE", "de-LI", "de-CH", "el", "gn", "gu", "ha", "haw", "he", "hi", "hu", "is", "id", "ia", "ga", "it", "it-IT", "it-CH", "ja", "kn", "kk", "km", "ko", "ku", "ky", "lo", "la", "lv", "ln", "lt", "mk", "ms", "ml", "mt", "mr", "mn", "ne", "no", "nb", "nn", "oc", "or", "om", "ps", "fa", "pl", "pt", "pt-BR", "pt-PT", "pa", "qu", "ro", "mo", "rm", "ru", "gd", "sr", "sh", "sn", "sd", "si", "sk", "sl", "so", "st", "es", "es-AR", "es-419", "es-MX", "es-ES", "es-US", "su", "sw", "sv", "tg", "ta", "tt", "te", "th", "ti", "to", "tr", "tk", "tw", "uk", "ur", "ug", "uz", "vi", "wa", "cy", "fy", "xh", "yi", "yo", "zu",
+        "af", "sq", "am", "ar", "an", "hy", "ast", "az", "eu", "be", "bn", "bs", "br", "bg", "ca", "ckb", "zh", "zh-hk", "zh-cn", "zh-tw", "co", "hr", "cs", "da", "nl", "en", "en-au", "en-ca", "en-in", "en-nz", "en-za", "en-gb", "en-us", "eo", "et", "fo", "fil", "fi", "fr", "fr-ca", "fr-fr", "fr-ch", "gl", "ka", "de", "de-at", "de-de", "de-li", "de-ch", "el", "gn", "gu", "ha", "haw", "he", "hi", "hu", "is", "id", "ia", "ga", "it", "it-it", "it-ch", "ja", "kn", "kk", "km", "ko", "ku", "ky", "lo", "la", "lv", "ln", "lt", "mk", "ms", "ml", "mt", "mr", "mn", "ne", "no", "nb", "nn", "oc", "or", "om", "ps", "fa", "pl", "pt", "pt-br", "pt-pt", "pa", "qu", "ro", "mo", "rm", "ru", "gd", "sr", "sh", "sn", "sd", "si", "sk", "sl", "so", "st", "es", "es-ar", "es-419", "es-mx", "es-es", "es-us", "su", "sw", "sv", "tg", "ta", "tt", "te", "th", "ti", "to", "tr", "tk", "tw", "uk", "ur", "ug", "uz", "vi", "wa", "cy", "fy", "xh", "yi", "yo", "zu",
     ];
 
     protected array $requiredLanguagesCodes = [];
@@ -57,24 +57,22 @@ class Translatable extends Json
 
     public function keyValue(string $key = 'Language', string $value = 'Value'): static
     {
-        $this->fields([
-            Select::make($key, 'key')
-                ->options($this->getLanguagesCodes())
-                ->nullable(),
-            Text::make($value, 'value'),
-        ]);
-
         return $this;
     }
 
     public function getFields(): Fields
     {
+
         if (empty($this->fields)) {
             $this->fields([
-                Select::make(__('Code'), 'key')
-                    ->options(array_combine($this->getLanguagesCodes(), array_map(static fn ($code) => Str::upper($code), $this->getLanguagesCodes())))
-                    ->nullable(),
+
+                //Select::make(__('Code'), 'key')
+                //    ->options(array_combine($this->getLanguagesCodes(), array_map(static fn ($code) => Str::upper($code), $this->getLanguagesCodes())))
+                //    ->nullable(),
+
+                Text::make(__('Code'), 'key'),
                 Text::make(__('Value'), 'value'),
+
             ]);
         }
 
