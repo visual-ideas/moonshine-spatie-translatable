@@ -111,8 +111,19 @@ class Translatable extends Json
     public function formViewValue(Model $item): mixed
     {
 
-        return collect($item->getTranslations($this->field()))
-            ->toArray();
+        // TODO Переделать на SELECT
+
+        $array = $item->getTranslations($this->field());
+
+        if (!empty($this->requiredLanguagesCodes)) {
+            foreach ($this->requiredLanguagesCodes as $languagesCode) {
+                if (!isset($array[$languagesCode])) {
+                    $array[$languagesCode] = null;
+                }
+            }
+        }
+
+        return $array;
     }
 
     /**
