@@ -57,6 +57,11 @@ class Translatable extends Json
 
     public function keyValue(string $key = 'Language', string $value = 'Value'): static
     {
+        $this->fields([
+            Text::make($key, 'key'),
+            Text::make($value, 'value'),
+        ]);
+
         return $this;
     }
 
