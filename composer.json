@@ -39,7 +39,6 @@
         }
     },
     "conflict": {
-        "moonshine/moonshine": "<1.52"
     },
     "scripts": {
     },

@@ -1,6 +1,7 @@
 <?php
 
 namespace VI\MoonShineSpatieTranslatable\Fields;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -12,7 +13,15 @@ use MoonShine\Fields\Text;
 class Translatable extends Json
 {
     protected array $languagesCodes = [
-        "af", "sq", "am", "ar", "an", "hy", "ast", "az", "eu", "be", "bn", "bs", "br", "bg", "ca", "ckb", "zh", "zh-hk", "zh-cn", "zh-tw", "co", "hr", "cs", "da", "nl", "en", "en-au", "en-ca", "en-in", "en-nz", "en-za", "en-gb", "en-us", "eo", "et", "fo", "fil", "fi", "fr", "fr-ca", "fr-fr", "fr-ch", "gl", "ka", "de", "de-at", "de-de", "de-li", "de-ch", "el", "gn", "gu", "ha", "haw", "he", "hi", "hu", "is", "id", "ia", "ga", "it", "it-it", "it-ch", "ja", "kn", "kk", "km", "ko", "ku", "ky", "lo", "la", "lv", "ln", "lt", "mk", "ms", "ml", "mt", "mr", "mn", "ne", "no", "nb", "nn", "oc", "or", "om", "ps", "fa", "pl", "pt", "pt-br", "pt-pt", "pa", "qu", "ro", "mo", "rm", "ru", "gd", "sr", "sh", "sn", "sd", "si", "sk", "sl", "so", "st", "es", "es-ar", "es-419", "es-mx", "es-es", "es-us", "su", "sw", "sv", "tg", "ta", "tt", "te", "th", "ti", "to", "tr", "tk", "tw", "uk", "ur", "ug", "uz", "vi", "wa", "cy", "fy", "xh", "yi", "yo", "zu",
+        "af", "sq", "am", "ar", "an", "hy", "ast", "az", "eu", "be", "bn", "bs", "br", "bg", "ca", "ckb", "zh", "zh-hk",
+        "zh-cn", "zh-tw", "co", "hr", "cs", "da", "nl", "en", "en-au", "en-ca", "en-in", "en-nz", "en-za", "en-gb",
+        "en-us", "eo", "et", "fo", "fil", "fi", "fr", "fr-ca", "fr-fr", "fr-ch", "gl", "ka", "de", "de-at", "de-de",
+        "de-li", "de-ch", "el", "gn", "gu", "ha", "haw", "he", "hi", "hu", "is", "id", "ia", "ga", "it", "it-it",
+        "it-ch", "ja", "kn", "kk", "km", "ko", "ku", "ky", "lo", "la", "lv", "ln", "lt", "mk", "ms", "ml", "mt", "mr",
+        "mn", "ne", "no", "nb", "nn", "oc", "or", "om", "ps", "fa", "pl", "pt", "pt-br", "pt-pt", "pa", "qu", "ro",
+        "mo", "rm", "ru", "gd", "sr", "sh", "sn", "sd", "si", "sk", "sl", "so", "st", "es", "es-ar", "es-419", "es-mx",
+        "es-es", "es-us", "su", "sw", "sv", "tg", "ta", "tt", "te", "th", "ti", "to", "tr", "tk", "tw", "uk", "ur",
+        "ug", "uz", "vi", "wa", "cy", "fy", "xh", "yi", "yo", "zu",
     ];
 
     protected array $requiredLanguagesCodes = [];
@@ -22,7 +31,7 @@ class Translatable extends Json
     protected bool $keyValue = true;
 
     /**
-     * @param array $languages
+     * @param  array  $languages
      * @return $this
      */
     public function requiredLanguages(array $languages): static
@@ -34,7 +43,7 @@ class Translatable extends Json
     }
 
     /**
-     * @param array $languages
+     * @param  array  $languages
      * @return $this
      */
     public function priorityLanguages(array $languages): static
@@ -59,7 +68,8 @@ class Translatable extends Json
     {
         $this->fields([
             Select::make($key, 'key')
-                ->options(array_combine($this->getLanguagesCodes(), array_map(static fn ($code) => Str::upper($code), $this->getLanguagesCodes())))
+                ->options(array_combine($this->getLanguagesCodes(),
+                    array_map(static fn($code) => Str::upper($code), $this->getLanguagesCodes())))
                 ->nullable(),
             Text::make($value, 'value'),
         ]);
@@ -69,10 +79,12 @@ class Translatable extends Json
 
     public function getFields(): Fields
     {
+
         if (empty($this->fields)) {
             $this->fields([
                 Select::make(__('Code'), 'key')
-                    ->options(array_combine($this->getLanguagesCodes(), array_map(static fn ($code) => Str::upper($code), $this->getLanguagesCodes())))
+                    ->options(array_combine($this->getLanguagesCodes(),
+                        array_map(static fn($code) => Str::upper($code), $this->getLanguagesCodes())))
                     ->nullable(),
                 Text::make(__('Value'), 'value'),
             ]);
@@ -88,10 +100,14 @@ class Translatable extends Json
 
     public function indexViewValue(Model $item, bool $container = false): string
     {
+
+        return (string)$item->{$this->field()};
+
+        /*
         $columns = [];
 
         $values = collect($item->getTranslations($this->field()))
-            ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
+            ->map(fn($value, $key) => ['key' => $key, 'value' => $value])
             ->values();
 
         foreach ($this->getFields() as $field) {
@@ -102,16 +118,25 @@ class Translatable extends Json
             'columns' => $columns,
             'values' => $values,
         ]);
+        */
     }
 
     public function exportViewValue(Model $item): string
     {
-        return $item->getTranslation($this->field());
+        return (string)$item->{$this->field()};
+
+        //return $item->getTranslation($this->field());
     }
 
     public function formViewValue(Model $item): mixed
     {
-        return $item->getTranslations($this->field());
+
+        $translations = collect($item->getTranslations($this->field()));
+        return $translations->mapWithKeys(fn(string $value, string $key) => [
+                $key => ['key' => $key, 'value' => $value]
+            ])
+            ->values()
+            ->toArray();
     }
 
     /**
@@ -121,16 +146,19 @@ class Translatable extends Json
     {
         if ($this->isCanSave() && $this->requestValue() !== false) {
             $array = collect($this->requestValue())
-                ->filter(fn ($data) => ! empty($data['key']) && ! empty($data['value']))
-                ->mapWithKeys(fn ($data) => [$data['key'] => $data['value']])
+                ->filter(fn($data) => !empty($data['key']) && !empty($data['value']))
+                ->mapWithKeys(fn($data) => [$data['key'] => $data['value']])
                 ->toArray();
 
             $notSetLanguages = array_diff($this->requiredLanguagesCodes, array_keys($array));
 
-            if (! empty($notSetLanguages)) {
+            if (!empty($notSetLanguages)) {
                 throw ValidationException::withMessages(
-                    [$this->field() =>
-                        sprintf('The field %s does not have translation values set for the following languages: %s', $this->label(), implode(', ', $notSetLanguages)), ]
+                    [
+                        $this->field() =>
+                            sprintf('The field %s does not have translation values set for the following languages: %s',
+                                $this->label(), implode(', ', $notSetLanguages)),
+                    ]
                 );
             }
 
