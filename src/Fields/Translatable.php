@@ -102,30 +102,11 @@ class Translatable extends Json
     {
 
         return (string)$item->{$this->field()};
-
-        /*
-        $columns = [];
-
-        $values = collect($item->getTranslations($this->field()))
-            ->map(fn($value, $key) => ['key' => $key, 'value' => $value])
-            ->values();
-
-        foreach ($this->getFields() as $field) {
-            $columns[$field->field()] = $field->label();
-        }
-
-        return view('moonshine::ui.table', [
-            'columns' => $columns,
-            'values' => $values,
-        ]);
-        */
     }
 
     public function exportViewValue(Model $item): string
     {
         return (string)$item->{$this->field()};
-
-        //return $item->getTranslation($this->field());
     }
 
     public function formViewValue(Model $item): mixed
