@@ -145,6 +145,7 @@ class Translatable extends Json
     public function save(Model $item): Model
     {
         if ($this->isCanSave() && $this->requestValue() !== false) {
+
             $array = collect($this->requestValue())
                 ->filter(fn($data) => !empty($data['key']) && !empty($data['value']))
                 ->mapWithKeys(fn($data) => [$data['key'] => $data['value']])
@@ -162,7 +163,8 @@ class Translatable extends Json
                 );
             }
 
-            $item->{$this->field()} = $array;
+            $item->setTranslations($this->field(), $array);
+
         }
 
         return $item;
