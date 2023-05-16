@@ -9,9 +9,14 @@ use MoonShine\Fields\Fields;
 use MoonShine\Fields\Json;
 use MoonShine\Fields\Select;
 use MoonShine\Fields\Text;
+use MoonShine\Fields\Textarea;
+use MoonShine\Fields\TinyMce;
 
 class Translatable extends Json
 {
+
+    protected $inputField = Text::class;
+
     protected array $languagesCodes = [
         "af", "sq", "am", "ar", "an", "hy", "ast", "az", "eu", "be", "bn", "bs", "br", "bg", "ca", "ckb", "zh", "zh-hk",
         "zh-cn", "zh-tw", "co", "hr", "cs", "da", "nl", "en", "en-au", "en-ca", "en-in", "en-nz", "en-za", "en-gb",
@@ -30,10 +35,20 @@ class Translatable extends Json
 
     protected bool $keyValue = true;
 
-    /**
-     * @param  array  $languages
-     * @return $this
-     */
+    public function textarea(): static {
+
+        $this->inputField = Textarea::class;
+
+        return $this;
+    }
+
+    //public function tinyMce(): static {
+    //
+    //    $this->inputField = TinyMce::class;
+    //
+    //    return $this;
+    //}
+
     public function languages(array $languages): static
     {
         sort($languages);
@@ -42,10 +57,6 @@ class Translatable extends Json
         return $this;
     }
 
-    /**
-     * @param  array  $languages
-     * @return $this
-     */
     public function requiredLanguages(array $languages): static
     {
         sort($languages);
@@ -54,10 +65,6 @@ class Translatable extends Json
         return $this;
     }
 
-    /**
-     * @param  array  $languages
-     * @return $this
-     */
     public function priorityLanguages(array $languages): static
     {
         sort($languages);
@@ -83,7 +90,7 @@ class Translatable extends Json
                 ->options(array_combine($this->getLanguagesCodes(),
                     array_map(static fn($code) => Str::upper($code), $this->getLanguagesCodes())))
                 ->nullable(),
-            Text::make($value, 'value'),
+            $this->inputField::make($value, 'value'),
         ]);
 
         return $this;
@@ -98,7 +105,7 @@ class Translatable extends Json
                     ->options(array_combine($this->getLanguagesCodes(),
                         array_map(static fn($code) => Str::upper($code), $this->getLanguagesCodes())))
                     ->nullable(),
-                Text::make(__('Value'), 'value'),
+                $this->inputField::make(__('Value'), 'value'),
             ]);
         }
 
