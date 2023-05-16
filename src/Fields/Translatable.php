@@ -34,6 +34,18 @@ class Translatable extends Json
      * @param  array  $languages
      * @return $this
      */
+    public function languages(array $languages): static
+    {
+        sort($languages);
+        $this->languagesCodes = $languages;
+
+        return $this;
+    }
+
+    /**
+     * @param  array  $languages
+     * @return $this
+     */
     public function requiredLanguages(array $languages): static
     {
         sort($languages);
