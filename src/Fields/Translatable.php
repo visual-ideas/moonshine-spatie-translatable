@@ -132,9 +132,18 @@ class Translatable extends Json
     {
 
         $translations = collect($item->getTranslations($this->field()));
+
+        if ($translations->isEmpty() && $this->requiredLanguagesCodes) {
+            $translations = [];
+            foreach ($this->requiredLanguagesCodes as $code) {
+                $translations[$code] = '';
+            }
+            $translations = collect($translations);
+        }
+
         return $translations->mapWithKeys(fn(string $value, string $key) => [
-                $key => ['key' => $key, 'value' => $value]
-            ])
+            $key => ['key' => $key, 'value' => $value]
+        ])
             ->values()
             ->toArray();
     }
