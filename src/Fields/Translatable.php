@@ -172,7 +172,12 @@ class Translatable extends Json
                 );
             }
 
-            $item->replaceTranslations($this->field(), $array);
+            if ($this->isRemovable()) {
+                $item->replaceTranslations($this->field(), $array);
+                return $item;
+            }
+
+            $item->setTranslations($this->field(), $array);
 
         }
 
