@@ -178,6 +178,7 @@ class Translatable extends Json
             }
 
             $item->setTranslations($this->field(), $array);
+            return $item;
 
         }
 
