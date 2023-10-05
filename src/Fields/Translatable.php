@@ -35,17 +35,27 @@ class Translatable extends Json
 
     protected bool $keyValue = true;
 
-    public function textarea(): static {
+    public function textarea(): static
+    {
 
         $this->inputField = Textarea::class;
 
         return $this;
     }
 
-    public function tinyMce(): static {
-    
+    public function tinyMce(): static
+    {
+
         $this->inputField = TinyMce::class;
-    
+
+        return $this;
+    }
+
+    public function json(): static
+    {
+
+        $this->inputField = Json::class;
+
         return $this;
     }
 
@@ -99,13 +109,24 @@ class Translatable extends Json
     public function getFields(): Fields
     {
 
+        $inputField = $this->inputField::make(__('Value'), 'value');
+
+        if ($this->inputField === Json::class) {
+            $inputField = $inputField
+                ->fullpage()
+                ->fields([
+                    Text::make(__('Key'), 'title'),
+                    Text::make(__('Value'), 'value')
+                ]);
+        }
+
         if (empty($this->fields)) {
             $this->fields([
                 Select::make(__('Code'), 'key')
                     ->options(array_combine($this->getLanguagesCodes(),
                         array_map(static fn($code) => Str::upper($code), $this->getLanguagesCodes())))
                     ->nullable(),
-                $this->inputField::make(__('Value'), 'value'),
+                $inputField,
             ]);
         }
 
@@ -119,7 +140,6 @@ class Translatable extends Json
 
     public function indexViewValue(Model $item, bool $container = false): string
     {
-
         return (string)$item->{$this->field()};
     }
 
@@ -130,7 +150,6 @@ class Translatable extends Json
 
     public function formViewValue(Model $item): mixed
     {
-
         $translations = collect($item->getTranslations($this->field()));
 
         if ($translations->isEmpty() && $this->requiredLanguagesCodes) {
@@ -141,7 +160,7 @@ class Translatable extends Json
             $translations = collect($translations);
         }
 
-        return $translations->mapWithKeys(fn(string $value, string $key) => [
+        return $translations->mapWithKeys(fn(string|array $value, string $key) => [
             $key => ['key' => $key, 'value' => $value]
         ])
             ->values()
@@ -185,6 +204,3 @@ class Translatable extends Json
         return $item;
     }
 }
-
-
-
