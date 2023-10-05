@@ -42,12 +42,12 @@ class Translatable extends Json
         return $this;
     }
 
-    //public function tinyMce(): static {
-    //
-    //    $this->inputField = TinyMce::class;
-    //
-    //    return $this;
-    //}
+    public function tinyMce(): static {
+    
+        $this->inputField = TinyMce::class;
+    
+        return $this;
+    }
 
     public function languages(array $languages): static
     {
