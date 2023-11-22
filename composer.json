@@ -31,14 +31,13 @@
     "require": {
         "php": "^8.0|^8.1|^8.2"
     },
-    "require-dev": {
-    },
     "autoload": {
         "psr-4": {
             "VI\\MoonShineSpatieTranslatable\\": "src"
         }
     },
     "conflict": {
+        "moonshine/moonshine": "<2.0"
     },
     "scripts": {
     },
