@@ -2,9 +2,8 @@
 
 namespace VI\MoonShineSpatieTranslatable\Fields;
 
-use Closure;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
+use MoonShine\Exceptions\FieldException;
 use MoonShine\Fields\Field;
 use MoonShine\Fields\Fields;
 use MoonShine\Fields\Json;
@@ -12,7 +11,6 @@ use MoonShine\Fields\Select;
 use MoonShine\Fields\Text;
 use MoonShine\Fields\Textarea;
 use MoonShine\Fields\TinyMce;
-use MoonShine\Support\FieldEmptyValue;
 
 final class Translatable extends Json
 {
@@ -53,7 +51,7 @@ final class Translatable extends Json
         string $value = 'Value'
     ): static
     {
-        throw new \Exception('Can`t set onlyValue for this field!');
+        throw new FieldException('Can`t set onlyValue for this field!');
     }
 
     public function getFields(mixed $data = null): Fields
