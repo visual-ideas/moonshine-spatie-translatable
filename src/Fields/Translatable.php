@@ -12,6 +12,8 @@ use MoonShine\Fields\Text;
 use MoonShine\Fields\Textarea;
 use MoonShine\Fields\TinyMce;
 
+use Illuminate\Contracts\View\View;
+
 final class Translatable extends Json
 {
 
@@ -145,4 +147,8 @@ final class Translatable extends Json
         return true;
     }
 
+    protected function resolvePreview(): View|string
+    {
+        return $this?->data?->{$this->column()} ?? '';
+    }
 }
