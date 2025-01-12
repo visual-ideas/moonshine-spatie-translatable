@@ -130,6 +130,17 @@ final class Translatable extends Json
         return $this;
     }
 
+    public function customInputField(string $class): static
+    {
+        if (!is_subclass_of($class, Field::class)) {
+            throw new FieldException('The passed class must be a subclass of MoonShine\Fields\Field');
+        }
+
+        $this->inputField = $class;
+
+        return $this;
+    }
+
     public function keyValue(
         string $key = 'Language',
         string $value = 'Value',
