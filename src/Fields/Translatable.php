@@ -3,16 +3,18 @@
 namespace VI\MoonShineSpatieTranslatable\Fields;
 
 use Illuminate\Support\Str;
-use MoonShine\Exceptions\FieldException;
-use MoonShine\Fields\Field;
-use MoonShine\Fields\Fields;
-use MoonShine\Fields\Json;
-use MoonShine\Fields\Select;
-use MoonShine\Fields\Text;
-use MoonShine\Fields\Textarea;
-use MoonShine\Fields\TinyMce;
+use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
+use MoonShine\Contracts\UI\FieldContract;
+use MoonShine\UI\Exceptions\FieldException;
+use MoonShine\UI\Fields\Field;
+use MoonShine\UI\Fields\Json;
+use MoonShine\UI\Fields\Select;
+use MoonShine\UI\Fields\Text;
+use MoonShine\UI\Fields\Textarea;
+use MoonShine\TinyMce\Fields\TinyMce;
 
 use Illuminate\Contracts\View\View;
+use Throwable;
 
 final class Translatable extends Json
 {
@@ -21,8 +23,8 @@ final class Translatable extends Json
     protected bool $onlyValue = false;
 
     /**
-     * @var class-string<Field>
-     */
+     * @var class-string<FieldContract>
+    */
     protected string $inputField = Text::class;
 
     protected array $languagesCodes = [
@@ -43,23 +45,21 @@ final class Translatable extends Json
 
     protected function prepareFill(array $raw = [], mixed $casted = null): mixed
     {
-        return $casted->getTranslations($this->column());
+        return $casted->getOriginal()->getTranslations($this->column);
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function onlyValue(
         string $value = 'Value',
-        ?Field $valueField = null,
-    ): static
-    {
+        ?FieldContract $valueField = null,
+    ): static {
         throw new FieldException('Can`t set onlyValue for this field!');
     }
 
-    public function getFields(mixed $data = null): Fields
+    public function getFields(mixed $data = null): FieldsContract
     {
-
         $inputField = $this->inputField::make(__('Value'), 'value');
 
         if (empty($this->fields)) {
@@ -74,7 +74,7 @@ final class Translatable extends Json
         return parent::getFields();
     }
 
-    public function languages(array $languages): static
+    public function languages(array $languages): self
     {
         sort($languages);
         $this->languagesCodes = $languages;
@@ -82,7 +82,7 @@ final class Translatable extends Json
         return $this;
     }
 
-    public function requiredLanguages(array $languages): static
+    public function requiredLanguages(array $languages): self
     {
         sort($languages);
         $this->requiredLanguagesCodes = $languages;
@@ -90,7 +90,7 @@ final class Translatable extends Json
         return $this;
     }
 
-    public function priorityLanguages(array $languages): static
+    public function priorityLanguages(array $languages): self
     {
         sort($languages);
         $this->priorityLanguagesCodes = $languages;
@@ -108,32 +108,31 @@ final class Translatable extends Json
             ->toArray();
     }
 
-    public function textarea(): static
+    public function textarea(): self
     {
-
         $this->inputField = Textarea::class;
 
         return $this;
     }
 
-    public function tinyMce(): static
+    public function tinyMce(): self
     {
         $this->inputField = TinyMce::class;
 
         return $this;
     }
 
-    public function json(): static
+    public function json(): self
     {
         $this->inputField = Json::class;
 
         return $this;
     }
 
-    public function customInputField(string $class): static
+    public function customInputField(string $class): self
     {
         if (!is_subclass_of($class, Field::class)) {
-            throw new FieldException('The passed class must be a subclass of MoonShine\Fields\Field');
+            throw new FieldException('The passed class must be a subclass of MoonShine\UI\Fields\Field');
         }
 
         $this->inputField = $class;
@@ -144,8 +143,8 @@ final class Translatable extends Json
     public function keyValue(
         string $key = 'Language',
         string $value = 'Value',
-        ?Field $keyField = null,
-        ?Field $valueField = null,
+        ?FieldContract $keyField = null,
+        ?FieldContract $valueField = null,
     ): static {
         $this->fields([
             Select::make($key, 'key')
@@ -163,8 +162,23 @@ final class Translatable extends Json
         return true;
     }
 
+    protected function resolveOnApply(): null|Closure
+    {
+        return function ($item) {
+            $translations = $this->getRequestValue() !== false
+                ? collect($this->getRequestValue())->mapWithKeys(function ($item) {
+                    return [$item['key'] => $item['value']];
+                })->toArray()
+                : $item->getTranslations($this->column);
+
+            $item->replaceTranslations($this->column, $translations);
+
+            return $item;
+        };
+    }
+
     protected function resolvePreview(): View|string
     {
-        return $this?->data?->{$this->column()} ?? '';
+        return $this?->data?->{$this->column} ?? '';
     }
 }
