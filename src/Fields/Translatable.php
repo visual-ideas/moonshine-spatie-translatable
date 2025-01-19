@@ -162,6 +162,21 @@ final class Translatable extends Json
         return true;
     }
 
+    protected function resolveOnApply(): null|Closure
+    {
+        return function ($item) {
+            $translations = $this->getRequestValue() !== false
+                ? collect($this->getRequestValue())->mapWithKeys(function ($item) {
+                    return [$item['key'] => $item['value']];
+                })->toArray()
+                : $item->getTranslations($this->column);
+
+            $item->replaceTranslations($this->column, $translations);
+
+            return $item;
+        };
+    }
+
     protected function resolvePreview(): View|string
     {
         return $this?->data?->{$this->column} ?? '';
