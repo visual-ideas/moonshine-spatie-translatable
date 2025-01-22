@@ -29,7 +29,7 @@
         }
     ],
     "require": {
-        "php": "^8.0|^8.1|^8.2"
+        "php": "^8.0|^8.1|^8.2|^8.3|^8.4"
     },
     "autoload": {
         "psr-4": {
@@ -37,7 +37,7 @@
         }
     },
     "conflict": {
-        "moonshine/moonshine": "<2.14"
+        "moonshine/moonshine": "<3.0"
     },
     "scripts": {
     },
