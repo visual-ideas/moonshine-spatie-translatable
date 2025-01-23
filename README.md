@@ -9,9 +9,9 @@ Extend [JSON](https://moonshine-laravel.com/ru/docs/3.x/fields/json) field.
 
 | MoonShine | Moonshine Spatie Translatable | Currently supported |
 |:---------:|:-----------------------------:|---------------------|
-| \>= v1.0  |            ^1.0.0             |         no          |
-| \>= v2.0  |            ^2.0.0             |         yes         |
-| \>= v3.0  |            ^3.0.0             |         yes         |
+| \>= v1.0  |            ^1.0               |         no          |
+| \>= v2.0  |            ^2.0               |         yes         |
+| \>= v3.0  |            ^3.0               |         yes         |
 
 ## Installation
 **This field belongs to a separate package, you have to complete the installation before using it**
