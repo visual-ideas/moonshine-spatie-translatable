@@ -15,7 +15,7 @@ Extend [JSON](https://moonshine-laravel.com/ru/docs/3.x/fields/json) field.
 
 ## Installation
 **This field belongs to a separate package, you have to complete the installation before using it**
-
+ 
 For MoonShine 2.*:
 ```shell
 composer require "visual-ideas/moonshine-spatie-translatable:^2.0"
