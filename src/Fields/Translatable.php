@@ -2,6 +2,7 @@
 
 namespace VI\MoonShineSpatieTranslatable\Fields;
 
+use Closure;
 use Illuminate\Support\Str;
 use MoonShine\Exceptions\FieldException;
 use MoonShine\Fields\Field;
