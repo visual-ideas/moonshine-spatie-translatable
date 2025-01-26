@@ -2,6 +2,7 @@
 
 namespace VI\MoonShineSpatieTranslatable\Fields;
 
+use Closure;
 use Illuminate\Support\Str;
 use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
 use MoonShine\Contracts\UI\FieldContract;
