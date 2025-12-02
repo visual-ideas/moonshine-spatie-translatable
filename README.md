@@ -12,6 +12,7 @@ Extend [JSON](https://moonshine-laravel.com/ru/docs/3.x/fields/json) field.
 | \>= v1.0  |            ^1.0               |         no          |
 | \>= v2.0  |            ^2.0               |         yes         |
 | \>= v3.0  |            ^3.0               |         yes         |
+| \>= v4.0  |            ^3.0               |         yes         |
 
 ## Installation
 **This field belongs to a separate package, you have to complete the installation before using it**
@@ -21,10 +22,11 @@ For MoonShine 2.*:
 composer require "visual-ideas/moonshine-spatie-translatable:^2.0"
 ```
 
-For MoonShine 3.* (current version):
+For MoonShine 3.*, 4.* (current version):
 ```shell
 composer require "visual-ideas/moonshine-spatie-translatable:^3.0"
 ```
+
 The field is purposed for work with the [Laravel-translatable](https://github.com/spatie/laravel-translatable) package made by [Spatie](https://spatie.be/open-source).
 Before using the Spatie\Translatable field, make sure that:
 - The [spatie/laravel-translatable](https://github.com/spatie/laravel-translatable) package is installed and configured.
