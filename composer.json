@@ -26,10 +26,15 @@
             "name": "Alex",
             "email": "alex.visualideas@gmail.com",
             "role": "Developer"
+        },
+        {
+            "name": "Gennadiy Sevalnev",
+            "email": "gennadiy.sevalnev@mail.ru",
+            "role": "Developer"
         }
     ],
     "require": {
-        "php": "^8.0|^8.1|^8.2|^8.3|^8.4"
+        "php": "^8.0|^8.1|^8.2|^8.3|^8.4|^8.5"
     },
     "autoload": {
         "psr-4": {
@@ -44,6 +49,7 @@
     "extra": {
         "laravel": {
             "providers": [
+                "VI\\MoonShineSpatieTranslatable\\ServiceProvider"
             ]
         }
     }
