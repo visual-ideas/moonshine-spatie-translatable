@@ -3,23 +3,23 @@
 namespace VI\MoonShineSpatieTranslatable\Fields;
 
 use Closure;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Str;
 use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
+use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\UI\Exceptions\FieldException;
+use MoonShine\AssetManager\Css;
 use MoonShine\UI\Fields\Field;
 use MoonShine\UI\Fields\Json;
 use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
-use MoonShine\TinyMce\Fields\TinyMce;
-
 use Illuminate\Contracts\View\View;
 use Throwable;
 
 final class Translatable extends Json
 {
-
     protected bool $keyValue = true;
     protected bool $onlyValue = false;
 
@@ -44,9 +44,185 @@ final class Translatable extends Json
 
     protected array $priorityLanguagesCodes = [];
 
-    protected function prepareFill(array $raw = [], mixed $casted = null): mixed
+    protected bool $isCompact = false;
+
+    protected function assets(): array
     {
-        return $casted->getOriginal()->getTranslations($this->column);
+        return [
+            Css::make('vendor/moonshine-spatie-translatable/css/translatable-compact.css'),
+            ...$this->getInputFieldAssets(),
+        ];
+    }
+
+    protected function getInputFieldAssets(): array
+    {
+        if ($this->inputField === Text::class || $this->inputField === Textarea::class) {
+            return [];
+        }
+
+        $instance = $this->inputField::make(__('Value'), 'value');
+
+        return $instance->getAssets();
+    }
+
+    /** @return array<string, string> Rendered HTML per language code */
+    protected function renderLanguageFields(array $values, array $languages): array
+    {
+        $rendered = [];
+
+        foreach ($languages as $code => $name) {
+            $value = $values[$code] ?? '';
+
+            $field = $this->getInputFieldInstance($value);
+            $field->setValue($value);
+
+            $rendered[$code] = $field->render();
+        }
+
+        return $rendered;
+    }
+
+    public function getInputFieldInstance(?string $value = null): FieldContract
+    {
+        $field = $this->inputField::make('', 'value');
+        $field->withoutWrapper();
+
+        if ($value !== null) {
+            $field->setValue($value);
+        }
+
+        return $field;
+    }
+
+    public function getInputField(): string
+    {
+        return $this->inputField;
+    }
+
+    public function compact(): static
+    {
+        $this->isCompact = true;
+
+        return $this;
+    }
+
+    public function isCompact(): bool
+    {
+        return $this->isCompact;
+    }
+
+    protected function resolveRender(): Renderable|Closure|string
+    {
+        if ($this->isCompact()) {
+            if (! $this->isDefaultMode() && $this->isPreviewMode()) {
+                return $this->preview();
+            }
+
+            return $this->renderCompact();
+        }
+
+        return parent::resolveRender();
+    }
+
+    protected function renderCompact(): Renderable|Closure|string
+    {
+        $values = $this->getValue() ?? [];
+
+        // Normalise from key-value array [[key,value],...] to associative [lang=>value,...]
+        if (\is_array($values) && \count($values) > 0) {
+            $first = reset($values);
+            if (\is_array($first) && array_key_exists('key', $first) && array_key_exists('value', $first)) {
+                $values = collect($values)
+                    ->mapWithKeys(fn (array $item): array => [$item['key'] => $item['value']])
+                    ->toArray();
+            }
+        }
+
+        $allLanguages = $this->getLanguagesCodes();
+
+        // Rebuild $values in the declared language order, keeping any extra
+        // (undeclared) languages at the end.
+        $orderedValues = [];
+        foreach (array_keys($allLanguages) as $code) {
+            if (array_key_exists($code, $values)) {
+                $orderedValues[$code] = $values[$code];
+            }
+        }
+        foreach ($values as $code => $v) {
+            if (!isset($allLanguages[$code])) {
+                $orderedValues[$code] = $v;
+            }
+        }
+        $values = $orderedValues;
+
+        // Determine the active language
+        $existing = array_keys($values);
+        $activeLanguage = $existing[0]
+            ?? $this->requiredLanguagesCodes[0]
+            ?? $this->priorityLanguagesCodes[0]
+            ?? array_key_first($allLanguages)
+            ?? 'en';
+
+        // Sort languages alphabetically for the add-dropdown
+        $sortedLanguages = $allLanguages;
+        sort($sortedLanguages);
+
+        // Pre-render the input field for each language.
+        // Each rendered field includes its own Alpine component (if any),
+        // so TinyMCE, Code, or any custom field initializes itself.
+        $renderedFields = $this->renderLanguageFields($values, $allLanguages);
+
+        return view('moonshine-spatie-translatable::fields.translatable-compact', [
+            'field' => $this,
+            'values' => $values,
+            'allLanguages' => $allLanguages,
+            'sortedLanguages' => $sortedLanguages,
+            'activeLanguage' => $activeLanguage,
+            'isRemovable' => $this->isRemovable(),
+            'renderedFields' => $renderedFields,
+        ]);
+    }
+
+    protected function prepareFill(array $raw = [], mixed $casted = null): array
+    {
+        if ($casted === null) {
+            return [];
+        }
+
+        // DataWrapperContract (e.g. ModelDataWrapper) proxies method calls via __call,
+        // which method_exists() cannot detect. Extract the underlying model first.
+        if ($casted instanceof DataWrapperContract) {
+            $casted = $casted->getOriginal();
+        }
+
+        if (! method_exists($casted, 'getTranslations')) {
+            return [];
+        }
+
+        try {
+            $translations = $casted->getTranslations($this->column);
+        } catch (Throwable) {
+            return [];
+        }
+
+        if (empty($translations)) {
+            return [];
+        }
+
+        return collect($translations)
+            ->map(fn ($v, $k): array => ['key' => $k, 'value' => $v])
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * prepareFill already returns key-value format,
+     * so skip the parent Json's reformatFilledValue which
+     * would double-encode it as {key: index, value: {...}}.
+     */
+    protected function reformatFilledValue(mixed $data): mixed
+    {
+        return $data;
     }
 
     /**
@@ -66,8 +242,10 @@ final class Translatable extends Json
         if (empty($this->fields)) {
             $this->fields([
                 Select::make(__('Code'), 'key')
-                    ->options(array_combine($this->getLanguagesCodes(),
-                        array_map(static fn($code) => Str::upper($code), $this->getLanguagesCodes()))),
+                    ->options(array_combine(
+                        $this->getLanguagesCodes(),
+                        array_map(static fn ($code) => Str::upper($code), $this->getLanguagesCodes())
+                    )),
                 $inputField,
             ]);
         }
@@ -77,7 +255,6 @@ final class Translatable extends Json
 
     public function languages(array $languages): self
     {
-        sort($languages);
         $this->languagesCodes = $languages;
 
         return $this;
@@ -85,7 +262,6 @@ final class Translatable extends Json
 
     public function requiredLanguages(array $languages): self
     {
-        sort($languages);
         $this->requiredLanguagesCodes = $languages;
 
         return $this;
@@ -93,7 +269,6 @@ final class Translatable extends Json
 
     public function priorityLanguages(array $languages): self
     {
-        sort($languages);
         $this->priorityLanguagesCodes = $languages;
 
         return $this;
@@ -101,7 +276,6 @@ final class Translatable extends Json
 
     protected function getLanguagesCodes(): array
     {
-        sort($this->languagesCodes);
 
         return collect(array_combine($this->requiredLanguagesCodes, $this->requiredLanguagesCodes))
             ->merge(array_combine($this->priorityLanguagesCodes, $this->priorityLanguagesCodes))
@@ -118,7 +292,15 @@ final class Translatable extends Json
 
     public function tinyMce(): self
     {
-        $this->inputField = TinyMce::class;
+        $tinyMceClass = 'MoonShine\\TinyMce\\Fields\\TinyMce';
+
+        if (!class_exists($tinyMceClass)) {
+            throw new \RuntimeException(
+                'Install moonshine/tinymce to use TinyMce input.'
+            );
+        }
+
+        $this->inputField = $tinyMceClass;
 
         return $this;
     }
@@ -149,8 +331,10 @@ final class Translatable extends Json
     ): static {
         $this->fields([
             Select::make($key, 'key')
-                ->options(array_combine($this->getLanguagesCodes(),
-                    array_map(static fn($code) => Str::upper($code), $this->getLanguagesCodes())))
+                ->options(array_combine(
+                    $this->getLanguagesCodes(),
+                    array_map(static fn ($code) => Str::upper($code), $this->getLanguagesCodes())
+                ))
                 ->nullable(),
             $this->inputField::make($value, 'value'),
         ]);
