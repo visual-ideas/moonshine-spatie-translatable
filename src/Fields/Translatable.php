@@ -364,6 +364,6 @@ final class Translatable extends Json
 
     protected function resolvePreview(): View|string
     {
-        return $this?->data?->{$this->column} ?? '';
+        return $this?->data?->getOriginal()->getTranslation($this->column, app()->getLocale()) ?? '';
     }
 }
