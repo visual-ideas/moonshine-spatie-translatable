@@ -32,6 +32,10 @@
         showAddMenu: false,
         selectedLanguageToAdd: '',
 
+        init() {
+            this.$el.addEventListener('input', () => this.syncActiveField());
+        },
+
         get activeValue() {
             const row = this.rows.find(r => r.key === this.activeLanguage);
             return row ? row.value : '';
@@ -71,11 +75,15 @@
         },
 
         // ── Generic field value sync ──────────────────────────────
+        // Scoped to the active language's own [data-lang] wrapper — every
+        // declared language renders its own real input, so an unscoped
+        // selector would always match the first-declared one instead of
+        // whichever tab is actually open.
         syncActiveField() {
-            const container = this.$el.querySelector('[data-lang-field]');
-            if (! container) return;
+            const wrap = this.$el.querySelector(`[data-lang-field] [data-lang='${this.activeLanguage}']`);
+            if (! wrap) return;
 
-            const input = container.querySelector('textarea, input:not([type=hidden])');
+            const input = wrap.querySelector('textarea, input:not([type=hidden])');
             if (! input) return;
 
             const row = this.rows.find(r => r.key === this.activeLanguage);
@@ -83,10 +91,10 @@
         },
 
         restoreActiveField() {
-            const container = this.$el.querySelector('[data-lang-field]');
-            if (! container) return;
+            const wrap = this.$el.querySelector(`[data-lang-field] [data-lang='${this.activeLanguage}']`);
+            if (! wrap) return;
 
-            const input = container.querySelector('textarea, input:not([type=hidden])');
+            const input = wrap.querySelector('textarea, input:not([type=hidden])');
             if (! input) return;
 
             const row = this.rows.find(r => r.key === this.activeLanguage);
@@ -166,7 +174,7 @@
             <div class="tcomp-input-card-body">
                 <div class="tcomp-input-wrap{{ $isEditor ? ' tcomp-input-wrap--editor' : '' }}" data-lang-field>
                     @foreach ($renderedFields as $langCode => $html)
-                        <div x-show="activeLanguage === '{{ $langCode }}'" x-transition:enter.duration.100ms>
+                        <div data-lang="{{ $langCode }}" x-show="activeLanguage === '{{ $langCode }}'" x-transition:enter.duration.100ms>
                             {!! $html !!}
                         </div>
                     @endforeach
