@@ -1,0 +1,146 @@
+/* ============================================
+   Spatie Translatable — Compact Mode Styles
+   ============================================ */
+
+.translatable-compact {
+    --tcomp-bg: #fff;
+    --tcomp-border: #e2e8f0;
+    --tcomp-primary: #4f46e5;
+    --tcomp-primary-light: #eef2ff;
+    --tcomp-text: #1e293b;
+    --tcomp-text-muted: #64748b;
+    --tcomp-radius: 0.5rem;
+}
+
+/* ── Language Badges ──────────────────────── */
+
+.tcomp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    border: 1px solid var(--tcomp-border);
+    border-radius: var(--tcomp-radius);
+    background: var(--tcomp-bg);
+    color: var(--tcomp-text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.tcomp-badge:hover {
+    border-color: var(--tcomp-primary);
+    color: var(--tcomp-primary);
+}
+
+.tcomp-badge--active {
+    background: var(--tcomp-primary-light);
+    border-color: var(--tcomp-primary);
+    color: var(--tcomp-primary);
+    font-weight: 600;
+}
+
+.tcomp-badge-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    font-size: 0.875rem;
+    line-height: 1;
+    border-radius: 9999px;
+    color: var(--tcomp-text-muted);
+    transition: all 0.15s ease;
+}
+
+.tcomp-badge-remove:hover {
+    background: #fecaca;
+    color: #dc2626;
+}
+
+/* ── Add Button ──────────────────────────── */
+
+.tcomp-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    border: 1px dashed var(--tcomp-border);
+    border-radius: var(--tcomp-radius);
+    background: transparent;
+    color: var(--tcomp-primary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tcomp-add-btn:hover {
+    border-color: var(--tcomp-primary);
+    background: var(--tcomp-primary-light);
+}
+
+/* ── Add Language Panel ──────────────────── */
+
+.tcomp-add-panel {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border: 1px solid var(--tcomp-border);
+    border-radius: var(--tcomp-radius);
+    background: #f8fafc;
+}
+
+.tcomp-add-panel select {
+    width: 100%;
+    max-width: 16rem;
+}
+
+/* ── Input Card ──────────────────────────── */
+
+.tcomp-input-card {
+    border: 1px solid var(--tcomp-border);
+    border-radius: var(--tcomp-radius);
+    overflow: hidden;
+}
+
+.tcomp-input-card-body {
+    padding: 1rem;
+}
+
+.tcomp-input-wrap--editor {
+    min-height: 200px;
+}
+
+/* ── Empty State ─────────────────────────── */
+
+.tcomp-empty-state {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--tcomp-text-muted);
+    font-size: 0.875rem;
+    border: 1px dashed var(--tcomp-border);
+    border-radius: var(--tcomp-radius);
+}
+
+/* ── Dark Mode Support ──────────────────── */
+
+.dark .translatable-compact {
+    --tcomp-bg: #1e293b;
+    --tcomp-border: #334155;
+    --tcomp-primary: #818cf8;
+    --tcomp-primary-light: #1e1b4b;
+    --tcomp-text: #f1f5f9;
+    --tcomp-text-muted: #94a3b8;
+}
+
+.dark .tcomp-add-panel {
+    background: #0f172a;
+}
+
+.dark .tcomp-empty-state {
+    background: #0f172a;
+}
